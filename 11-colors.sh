@@ -3,6 +3,7 @@
 # red 31m
 # green 32m
 # yellow 33m
+# normal color 0m
 
 echo -e "\e[31m hello world"
 echo "hello"
