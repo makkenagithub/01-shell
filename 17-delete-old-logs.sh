@@ -18,10 +18,10 @@ echo "Files are: $FILES"
 
 #while loop: IFS is internal filed separator. Its empty here. It ignores while space.
 # -r is not to ignore special characters like /
-while IFS= read -r line
+while IFS= read -r file
 do 
-    echo "deleting the file: $line"
-    rm -rf $line
+    echo "deleting the file: $file"
+    rm -rf $file
 done <<< $FILES     # FILES is given as input to while loop.
 
 
