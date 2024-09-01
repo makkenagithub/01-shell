@@ -1,6 +1,6 @@
 #!/bin/bash
 
-THRESHOLD=75
+THRESHOLD=5
 DISK_USAGE=$(df -hT | grep xfs)  # displays the xfs type file systems and their memory usages
 
 
