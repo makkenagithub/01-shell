@@ -16,7 +16,7 @@ $FILES=(find $SOURCE_DIR -name "*.log" -mtime +14)
 
 echo "Files are: $FILES"
 
-#while loop: IFS is internal filed separator. Its empty here. It ignores while space.
+#while loop: IFS is internal filed separator. Its empty here. It ignores white space.
 # -r is not to ignore special characters like /
 while IFS= read -r file
 do 
