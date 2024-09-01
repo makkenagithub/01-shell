@@ -25,13 +25,13 @@ fi
 #check destination directory exist or not
 if [ ! -d $DEST_DIR ]
 then
-    echo "source directory $SOURCE_DIR does not exist"
+    echo "source directory $DEST_DIR does not exist"
     exit 1
 fi
 
 FILES=$(find $SOURCE_DIR -name "*.log" -mtime +$DAYS)
 
-if [ ! -z $FILES ]    # if $FILES is not empty 
+if [[ ! -z $FILES ]]  # if $FILES is not empty. single [ gave error initially. [[ worked fine
 then
     echo "Files older than $DAYS exist"
     ZIP_FILE="$DEST_DIR/app-logs-$TIME_STAMP.zip"
