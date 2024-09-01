@@ -12,4 +12,4 @@ do
     then
         echo "Filesystem $PARTITION is $CURRENT_USAGE% full. Please check."
     fi
-done <<< $DISK_USAGE
+done <<< $DISK_USAGE 
