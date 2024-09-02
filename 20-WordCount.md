@@ -1,9 +1,15 @@
 command for counting words in a given file and its outputs
- -o Print each match instead of matching lines
- \w* Match word characters
- sort - sort the matches before piping to uniq.
- uniq -c --> print the uniqe lines and the number of occurences -c
+
+-o -> Print each match instead of matching lines
+
+\w* -> Match word characters
+
+sort -> sort the matches before piping to uniq.
+
+uniq -c --> print the uniqe lines and the number of occurences -c
+
 sort -nr -->Reverse sort by number of occurences.
+
 
 ```
 grep -o "\w*" search.sh
