@@ -55,8 +55,8 @@ $ tail -n 5 <filename>
 
 File edit:
 vi / vim
-:q – quit the file
-:wq – write and quit
+:q! – quit the file
+:wq! – write and quit
 :q! – don’t save and quit.
 :set nu   -- to display numbers 
 :set nonu  -> to not display numbers
@@ -589,12 +589,12 @@ echo "hello"
 
 Loops:
 for i in 1 2 3 4 5 6 7 8 9 10
-di
+do
 	echo $i
 done
 
 for i in {0..10}  # 0 to 10
-di
+do
 	echo $i
 done
 
@@ -665,7 +665,7 @@ Condition to check if a variable is empty
 If [ -z $Var”]
 then
    # $var is empty
-Fi
+fi
 Zip command:
 $zip <zip file name> <file names to zip>
 Eg: $zip suresh.zip file1.txt file2.txt
@@ -677,10 +677,10 @@ $dnf install zip -y
 
 While loop:
 TO read the output or reading files we usually use while loop.
-While (condition)
-Do
+While [condition]
+do
 
-Done
+done
 
 Crontab:
 We can schedule the scripts periodically.
