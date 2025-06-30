@@ -1,0 +1,697 @@
+1.	Install git bash and open it. Goto some directory i.e. /c/users/usha. We are in windows laptop now
+2.	To generate public and private keys , the command is
+```
+$ ssh-keygen -f <file name>
+```
+We should have some client to connect to linux server i.e. putty, gitbash, mobaxterm etc. The above command generates 2 files, public key (key.pub file) and private key (key.pem file)
+3.	Login to aws account and create a key pair , here give the public key generated with above command.
+4.	Create a security group which allows ssh connectivity. Its port is 22
+5.	Create an EC2 instance in AWS with Amazon linux 2023 machine with t3 micro. Give here the key pair and security groups generated in step 2 and 3.
+6.	Connect to EC2 server from gitbash with below command. Ec2-user is default user in aws ec2.
+$ ssh -i <key.pem> ec2-user@<public IP of EC2>
+Now you are in aws ec2 server.
+
+cat command:
+To write to file or replace the content in file
+$ cat > suresh.txt
+To concatenate/append content in file
+$ cat >> suresh.txt
+To remove an empty directory
+$rmdir suresh
+Search a word in file
+$ grep <word> <file>
+Search a word with case insensitive
+$grep -i <word> <file>
+Curl and wget:
+To download a file from net
+$wget <url including file>
+TO display filedata from url
+$curl <url including file>
+Curl is used to run scripts
+
+Cut command: d indicates delimiter , f indicates fragment
+$echo suresh.makkena | cut -d ‘.’  -f1
+suresh
+$echo suresh.makkena | cut -d ‘.’  -f2
+makkena
+awk command:
+$echo suresh.makkena | awk -F “.” ‘{print $1F}’
+$echo suresh.makkena | awk -F “.” ‘{print $2F}’
+$echo suresh.makkena | awk -F “.” ‘{print $NF}’
+NF to get last fragment
+To get list of users in a server
+$awk -F “:” ‘{print $1F}’ /etc/passwd
+$awk -F “:” ‘{print $1F,3F}’ /etc/passwd
+Head and tail:
+To get first 10 lines of a file
+$head <file name>
+To get last 10 lines of a file
+$tail <file name>
+
+To get first 5 lines
+$ head -n 5 <filename>
+To get last 5 lines
+$ tail -n 5 <filename>
+
+File edit:
+vi / vim
+:q – quit the file
+:wq – write and quit
+:q! – don’t save and quit.
+:set nu   -- to display numbers 
+:set nonu  -> to not display numbers
+:/<word to find>   - to search a word (press n for next) – search from top
+:?<word to find>  - to search from bottom
+:noh  -- donot highlight anything
+:%d  - to delete everything in a file (% means everything. d for delete)
+:2d  - to delete 2nd line in a file
+:s/which-word/new-word   -> to replace a word with new word in the line where curser exist and only first occurrence (s for substitute)
+:s/which word/new-word/g   -> g for global.  -> to replace a word with new word in the line for all occurrences (s for substitute)
+:3s/which-word/new-word/g  -> to substitute new word for all occurrences in 3rd line
+:%s/which-word/new-word/g  -> to substitute/replace with new word in entire file
+
+In esc mode: 
+Press u to undo the changes
+u - undo
+Shift+g -> cursor goto the bottom of file
+gg  -> predd g two times, then cursor goto top of file
+yy – to copy a line
+p – to paste the copied line.
+10p -> to paste 10 times
+dd  -> to delete a line
+
+Permissions:
+-rw-  r--   r--  
+User(u), group (g), others (o)
+$chmod rwx+ugo <filename>
+$chmod rwx-go <filename>
+
+User management:
+id  -> gives all info about current user
+Add user: switch to root
+$ useradd ramesh
+To know whether user added or not
+$ id ramesh
+User info exists in /etc/passwd file
+Group info exists in /etc/group file
+TO set the password
+$ passwd ramesh
+
+$groupadd devops   -> create a group 
+Every user has atleast one primay group and multiple secondary groups.
+$usermod -g devops ramesh   -> add user ramesh to devops group
+$groupadd testing
+$usermod -aG testing ramesh  -> add user ramesh to secondary group testing
+$gpasswd -d ramesh testing    -> to remove user ramesh from secondary group testing
+TO remove a user, initially remove user from primary group devops and then remove the user.
+$gpasswd -d ramesh devops  -> error to delete from primary group.
+Hence assign him to his own group initially as below
+$usermod -g ramesh ramesh
+Then delete the user
+$userdel ramesh   -> now it deletes the user ramesh and group ramesh both.
+$groupdel <group name>    to delete a group
+
+Add user suresh
+$useradd suresh
+$passwd suresh
+Give password.
+Try to login to aws linux server with user name and password.
+$ssh suresh@IP  -> gives error
+Linux server does not allow to login to server with user id and password. Because by default , linux server is enabled with key based authentication.
+TO modify that goto /etc/ssh/sshd_config and change the password authentication to yes and comment publickeyauthentication
+After ssh config changes we need to restart it with below command
+$systemctl restart sshd
+Now the user can login with id, password
+$ssh suresh@IP
+
+TO enable SSH based auth:
+ modify /etc/ssh/sshd_config and change the password authentication to no and uncomment publicKeyAuthentication
+
+$systemctl restart sshd
+Every user has .ssh/authorized_keys file in the home directory /home/username. If does not exist, then we have to create with root user.
+
+When user joins newly, user need to generate key pair and send public key to linux server admin. Linux admin places the public key in /home/username/.ssh/authorized_keys
+Then give only read access to user (700) for the .ssh directory  /home/username/.ssh
+$chmod 400 authorized_keys
+$chown -R user:user .ssh
+
+Package management	:
+We use rpm (redhat package management) command to install the packages. The problem is rpm need to identify package dependencies, then install dependencies and then install the package.
+In latest we have yum (latest is dnf) which resolves the above problem.
+Yum (yellowdog updater modified) related urls exist in the path /etc/yum.repos.d/ path.
+TO install git:
+$dnf install git
+To know installed softwares in server
+$dnf list installed
+To know aht all packages available to install
+$dnf list available
+To uninstall / remove a package (-y for undisturbed mode)
+$dnf remove git -y
+
+TO know CPU, memory(RAM), OS info:
+$ cat /proc/cpuinfo
+$cat /proc/meminfo
+$cat /etc/os-release
+
+Service management:
+Service start , stop, status check, restart, enable, disable
+$systemctl status sshd
+TO install nginx
+$dnf install nginx -y
+$systemctl start nginx
+$systemctl status nginx
+Port for nginx is 80 by default. Now allow port 80 in aws server security group rules. Then try to open server public IP in browser. It shpws nginx.
+$systemctl restart nginx
+TO enable nginx: means, when the server is restarted, then nginx will start automatically.
+$systemctl enable nginx
+Process management
+To list all the services in linux
+$ ps -ef
+Foreground process: blocks the screen and runs in foreground
+Eg: $sleep 10
+Sleeps for 10 seconds in foreground
+Background process : runs in background and we can do other works
+To make a process to run in background use &
+$sleep 100 &
+tO see cpu and memory usage:
+$top
+$kill   pid     ->request
+$kill -9 pid   ->force kill
+
+Network management:
+TO display all network services
+$netstat
+$netstat -l
+$netstat -lt   ->to display internet based services (tcp)
+$netstat -ltp  -> to display process ID as well
+$netstat -ltpn   -> to get port number as well
+
+Private IPs defined by IANA are
+10.0.0.0/8
+192.168.0.0/16
+172.16.0.0/12
+AWS VPC rules:
+<=28 and >=16
+EG: 10.0.0.0/16 or 10.0.0.0/28
+
+3 tier architecture:
+Web tier – LB and web servers (front end) (html, CSS, react js, angular js, express js, java script, Jquery etc) (static)
+App/API tier – app servers (backend) (java, python, node js, .net, golang etc) (dynamic)
+Data tier – DB servers
+Front end apps are hosted in Nginx, Apache etc
+Backend apps are hosted in (Jboss, websphere, weblogic in old days) Tomcat
+
+DB server launch:
+Search for devops-practice and select redhat 9 from community servers.
+User id: ec2-user
+Pwd: DevOps321
+Install DB:
+$dnf install mysql-server -y
+Start MySQL server:
+
+$systemctl start mysqld
+
+To check status
+$systemctl status mysqld
+TO check port:
+$ netstat -lntp
+3306 port is opened
+TO check process:
+$ps -ef | grep mysql
+Enalbe:
+$systemctl enable mysqld
+We need to set the password for root user. By default root user exists
+$mysql_secure_insatllation –set-root-pass Suresh@12
+
+Now MySQL  server is installed in a Linux server. 
+Server software is mysql-server and its running, to check data we should connect to server through client. The client package is mysql.
+Now to connect to MySQL server we need a client software. MySQL client is mysql.
+Insatll client:
+$dnf install mysql 
+It shows , Already installed. So it’s already installed with mysql-server
+TO connect to mysql server, the command is
+$ mysql -h <IP> -u root -pSuresh@12
+IP – IP of the mysql client where its installed. As client is installed inside the server, we can use below command
+$mysql
+Now you are in mysql
+TO show DBs (schemas) in mysql
+>show databases;
+>use information_schema;  -> to go inside the schema/DB.
+>show tables;  -> to show tables inside schema.
+>select * from <table name>  -> to show data in a table
+
+Backend server:
+In backed we can use java, .net, python, nodejs, golang, php, ruby etc.
+We use nodejs.
+Launch a server in AWS 
+Search for devops-practice and select redhat 9 from community servers.
+User id: ec2-user
+Pwd: DevOps321
+
+Nodejs:
+Build file is package.josn which contains name, description, version, dependencies and their versions
+Build tool is npm. It search for build file and get its dependencies/libraries from internet.
+Source files = *.js
+Java:
+Build file for java is pom.xml and build tool is maven. 
+Source files = *.java
+Python:
+python is requirements.txt and build tool is pip
+Source files = *.py
+Switch to root in server.
+$dnf module list nodejs
+Module manages multiple versions in server. We can use the required version. It shows nodejs 18 and 20 versions. We use 20. So we disable 18
+$dnf module disable nodejs:18 -y
+Enable nodejs 20.
+$dnf module enable nodejs:20 -y
+Next give install command, it installs nodejs 20
+$dnf install nodejs -y
+
+Every app has its application specific user names (system users). (May be for MQ mqm etc) Add an application use like
+$useradd expense
+$mkdir /app
+Use /app folder to place application
+Download the application. We can use wget or curl -o.
+Curl -o works as wget which can download
+$ curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip
+$cd /app
+$unzip /tmp/backend.zip
+Here the developers code is downloaded.
+We need to check package.json exists or not and code files with .js extension exist or not.
+$npm install
+Tis command  checks the package.json and installs the dependencies from internet.
+It generated node_modules directory is created. All dependencies exist here.
+Npm = node package manager
+It means we compiled the developers code and performed the build.
+Then to start the application , we have to run some file i.e. index.js , TO make this process easy we prepare a script in backend and run it using systemctl service file.
+Setup SystemD Expense Backend Service
+vim /etc/systemd/system/backend.service   -> here we can place all our service files. Extension should be .service
+[Unit]
+Description = Backend Service
+
+[Service]
+User=expense
+Environment=DB_HOST="<MYSQL-SERVER-IPADDRESS Private IP>"
+ExecStart=/bin/node /app/index.js
+SyslogIdentifier=backend
+
+[Install]
+WantedBy=multi-user.target
+
+When we restart a server, its public IP may change, but its private IP does not change. Its for restart.
+If we make any changes in service file backend.service   , we need to reload the daemon
+$systemctl daemon-reload
+Then
+$systemctl start backend
+$systemctl enable backend
+$systemctl status backend
+It shows failed. Check the logs. Logs exist in /var/log/messages in Linux
+For this application to work fully functional we need to load schema to the Database.
+We need to load the schema. To load schema we need to install mysql client.  To have it installed we can use
+dnf install mysql -y
+Load Schema
+mysql -h <MYSQL-SERVER-IPADDRESS> -uroot -pExpenseApp@1 < /app/schema/backend.sql
+Private IP of DB server above command. All this in app server.
+Restart the service and check the status now
+systemctl restart backend
+$systemctl status backend
+$netstat -lntp
+Port is 8080 running. Backend apps opens mostly with 8080.
+Its running now
+
+TO check backend server connects to DB or not. Execute below command from backend server.
+$telnet ip port 
+DB server port id 3306 for mysql
+$ping <Private IP of DB>
+
+
+Front end server
+Launch a server 
+Launch a server in AWS 
+Search for devops-practice and select redhat 9 from community servers.
+User id: ec2-user
+Pwd: DevOps321
+
+Install Nginx
+$dnf install nginx -y 
+Enable nginx
+$systemctl enable nginx
+Start nginx
+$systemctl start nginx
+Try to access the service once over the browser and ensure you get some default content
+Nginx configs are in /etc/nginx
+/usr/share/nginx/html  here wbsites areplaced. It refers to index.html file here in this location
+/var/lo/nginx -> log files place
+
+Remove the default content that web server is serving.
+$rm -rf /usr/share/nginx/html/*
+Download the frontend content
+$curl -o /tmp/frontend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-frontend-v2.zip
+Extract the frontend content.
+$cd /usr/share/nginx/html
+$unzip /tmp/frontend.zip
+Try to access the nginx service once more over the browser and ensure you get expense content.
+Create Nginx Reverse Proxy Configuration.
+$vim /etc/nginx/default.d/expense.conf
+Add the following content
+proxy_http_version 1.1;
+
+location /api/ { proxy_pass http://<Private IP of backend server>:8080/; }
+
+location /health {
+  stub_status on;
+  access_log off;
+}
+Ensure you replace the localhost with the actual ip address of backend component server. Word localhost is just used to avoid the failures on the Nginx Server.
+Restart Nginx Service to load the changes of the configuration.
+$systemctl restart nginx
+
+Systemctl services will come automatically, when we install with dnf
+
+
+DNS:
+When we purchase a DNS in godaddy / hostinger, godaddy updates the info to corresponding TLD (.com or .in or .online etc). Then TLD updates to root servers. Then root servers provide name servers to TLD. TLD provides those name servers to hostinger.
+We can see name servers for our host in godaddy/hostinger.
+We create a A record in godaddy/hostinger with the IP address. A record is responsible to provide IP for your domain name.
+Root servers provide name servers. Name servers gives A record which we updated.
+
+
+
+
+
+When we try a DNS from browser the flow is as follows:
+Browser->Cache->OS->OS cache -> ISP DNS resolver ->root server ->TLD information -> TLD name servers -> name servers-> records
+A -> IP address
+CNAME -> another domain redirect
+MX – mail servers
+NS – name servers
+SOA – authorization
+TXT – validation purpose
+
+When we book a domain, domain registrars update name servers for that domain from TLD (top level domain).
+Book a domain in domain registrar -> domain registrar updates name servers to TLD ->TLD updates name servers to root servers.
+If we change IP in A record, then update will goto TLD. But if we update name servers then only the update will goto root servers.
+If we transfer the domain name from one registrar (hostingger) to another registar (AWS Route53), then name servers will change. 
+1.	Create a domain in hostinger 
+2.	Create a hosted zone in AWS route 53. Give the same domain name in route53
+3.	Then AWS shows you 4 name sevrers.
+4.	Update these 4 name servers in Hostinger. It may take upto 24 hours to update. Now hostinger updates the name servers to TLD. TLD updates the changed name servers to root servers.
+
+Update A record with IP address of front end server.
+Create another A record by entering subdomain for backend and DB server private IPs.
+
+
+Forward proxy:
+Advantages are Watch restricted content, change geo location.
+Its client side proxy. Only client aware of proxy. VPN acts as proxy. Hiding client identity
+VPN is for traffic monitor, secure connections, content access restriction.
+We can use proxy for cache purpose also
+
+Reverse proxy:
+Only server is aware of proxy. Its server side proxy. 
+Security b/w client and servers. Nginx is in front end. It acts as reverse proxy.
+Acts as load balancer.
+SSL termination:happens in reverse proxy server. SSL validation ends here in the front end server.
+
+
+Nginx load balancer:
+/etc/nginx/nginx.conf -> nginx configuration
+/usr/share/nginx/html  -> nginx website info
+/var/log/nginx -> nginx logs
+Create 3 devops-practice servers. Install nginx in all 3 servers. Create website like server 1 and server 2 in  servers 2 and 3. (add this in index.html <h1>This is server 1</h1>) in path /usr/share/nginx/html
+In other server server 1 add below upstream block in http block in nginx config file.. It informs nginx that we have some upstream servers.
+upstream backend {
+	server private IP/ public IP of backend server2
+	server private IP/ public IP of backend server3
+    }
+
+Add loadbalance.conf with below info in default.d path
+proxy_http_version 1.1;
+
+location / { proxy_pass http://backend/; }
+
+location /health {
+  stub_status on;
+  access_log off;
+}
+
+
+Linux Folder structure:
+/ -> root directory of OS
+/bin  binaries i.e. essential commands like ls, cat, grep etc
+/sbin  -> system binaries i.e admin commands, reboot, iptables etc 
+/boot  -> when linux server starts, it refers boot directory for system configuration
+/dev -> devices . monitor/terminal, keyboard , printer etc
+/etc -> extra configurations. -> system config files, service config files.(systemctl services, ssh configs, nginx configs etc)
+/home -> home directory of users. All users directory are here
+/lib – libraries. Libraries required by OS or dependencies. (.dll files in windows)
+/lib64 -> 64 bit libraries
+/media -> media devices.CD, DVD, USB etc
+/mnt -> mount. Adding extra disks
+/opt – optional. If you want some 3rd party apps , we can keep here.
+/proc -> process oriented information. /proc/cpuinfo, /proc/meminfo
+/root -> home dir of root user
+/run – running information of server.
+/srv – service files. When we use server to serve as file server like FTP we can use.
+/swap -> swap space. If RAM space is full, OS uses /swap space (like a reserved space)
+/sys – system kernal info , devices info
+/tmp – temporary directory
+/usr – shared files and documents. /usr/share/nginx/html etc
+/var -> variables. Logs and messages.
+
+Commands:
+TO check ram memory usage, -m for MB
+$free -m
+To check disk file usage (hard disk usage)
+$ df -hT
+
+Shell: is an interpreter in linux , that checks and executes the user commands
+/bin/bash
+
+
+
+
+
+
+GIT: is a decentralized source code management.
+GITOPS -> git is the single source of truth.
+GIT follows distributed/decentralized architecture. Same kind of setup exist in remote server is available in all comupters connected to that repo. So at point of time single computer is enough to restore everything. This is called distributed/decentralized. This is achieved through local repo setup.
+Git concept is implemented in github, bitbucket, gitlab, codecommit (aws), azure repos etc
+Git flow:
+VS code(work space) -> add to staging area -> commit to local repo -> push to remote repo
+Now create a new repository in github. We see an url https://github.com/makkenagithub/DS.git likethis.
+Clone this repo to local laptop. Open gitbash and give below command
+$ git clone https://github.com/makkenagithub/DS.git
+It creates a DS directory. Go to that directory
+$ cd DS
+Now we open VS code and open this directory in VS code. Then create our script files. Say 01-helloworld.sh
+To get status 
+$git status
+TO place the file to staging area
+$git add 01-helloworld.sh
+To do some more changes in the file, remove it from staging area
+$git rm - -cached 01-helloworld.sh
+$git status
+TO place the file to staging area
+$git add 01-helloworld.sh
+To commit to local repo
+$git commit -m “message - I created hellow world” 
+We get error. We need to give username and email. Those commands are displayed in error message.
+Then commit it
+$git commit -m “message - I created hellow world” 
+Check logs
+$git log
+Until here its in local repo.
+To push to remote repos
+$git push origin main
+It asks for username and password of github. Main is branch name. its default branch
+
+Shell:
+Shell is an interpreter which executes commands.
+First line in shell script is shebang which interprets commands and execute them.
+#!/bin/bash
+Echo “hello world”
+
+We can run shell script with below commands
+$sh filename.sh
+$bash filename.sh
+$./filename.sh   -> for this command we need execute permission. For the above two commands no need of execute permission.
+First time we used git clone url to get the entire git repository. Later if there is any change/new files added in the repos we can use git pull, to get the changes.
+$git pull
+
+Single line command to add, commit and push
+$git add filename.sh ; git commit -m “message”; git push origin main
+$git add .   -> stages all files
+$git add . ; git commit -m “message”; git push origin main
+Variables:
+VAR_NAME=VALUE   (no space b/w var name, = and value)
+Arguments/inputs:
+$sh filename.sh Ramesh Suresh
+Ramesh is 1st arguments Suresh is 2nd arguments. We use $1 and $2 to use them in the scripts
+Arrays:
+FRUITS=(“APPLE” “KIWI” “ORANGE”)
+
+Executing a command inside shell script:
+VARIABLE=$(command)
+
+Addition of 2 numbers
+SUM=$(($NUM1+$NUM2))
+#first ( is to run a command , second ( is to perform addition.
+Echo “addition of two numbers is: $SUM”
+Special variables in shell:
+I want to pass all variables to script
+$@
+I want to know howmany variables passed to the script
+$#
+TO know name of the script which we are running
+$0
+To know the current working directory
+$PWD
+To know home directory of current user is 
+$HOME
+To know PID of the script executing now
+$$
+TO know the PID of the last background running command 
+$!
+Conditions:
+if [ $NUMBER -gt 20 ]
+then
+	echo “”
+else
+	echo “”
+fi
+
+uid for root is 0
+TO get the user ID of a user command is
+$id -u
+Exit status of commands:
+TO know the status of previous command
+$?
+0 -> success
+1to 127 -> failure
+The disadvantage with shell scripting is it continue to execute the commands in the script, even if the previous commands fail. We have to manually write code to come out of script when a command fails in the script. exit 1 can be used to come out of script.
+ Functions:
+Functionname(){
+}
+
+Colours:
+# red 31m
+# green 32m
+# yellow 33m
+#normal color 0m
+
+echo -e "\e[31m hello world"
+echo "hello"
+echo -e "\e[32m hello world \e[0m"
+echo "hello"
+echo -e "\e[33m hello world \e[0m"
+echo "hello"
+
+Loops:
+for i in 1 2 3 4 5 6 7 8 9 10
+di
+	echo $i
+done
+
+for i in {0..10}  # 0 to 10
+di
+	echo $i
+done
+
+
+Logging:
+By default below commands redirects only successful outputs
+$ ls -l > log.txt
+1 for success
+2 for error
+$ ls -lrt 1> log.txt  ->log.txt stores the success command output
+$ls -lrt 2> log.txt -> log.txt stores unsuccesfull output. Here its does not store anything as it’s a success command
+$lss 2> log.txt  -> log.txt stores unsuccesfull output
+$lsss 1> log.txt  -> log.txt stores the success command output. Here its does not store anything as it’s a unsuccessful command
+
+If we want both success and unsuccess command logs then use &>>
+$ls -lrt &> log.txt   -> it stores both success and unsuccess command output.
+$ls -lrt &>> log.txt  -> to append the both success and unsuccess command.
+
+Tee command:
+tee command is to write logs to multiple destinations.
+ tee command writes to sandard output (command line) and also multiple files (log files) 
+$ tee -a file.log  -> displays on command line and also writes to file.log
+$ &>> file.log -> writes to file.log only
+
+Idempotency:
+If we develop a script, if we run it for multiple times, it should give same result. We have to develop the script in such way. Its idempotency.
+
+
+HTTP Methods and HTTP status codes:
+CRUD
+GET POST PUT DELETE OPTIONS
+GET – read. Read data from DB
+POST – create – We should send data, usually data goes in json
+PUT – update – update the existing information
+DELETE – delete 
+2** - 200, 201, 204 -> success codes
+4** - 400 client side error.  
+400 – bad request
+401 -> unauthorized
+402 – payment required
+403 – forbidden means, you have authentication access, but you do not have access to that particular resource.
+404 is file not found
+405 – method not allowed. 
+Who is the client for backend? -> Front end
+5** -> server side issue. They have to fix.
+500 – internal server error
+501 – not implemented
+502 – bad gateway
+503 – service unavailable
+504 – gateway timeout
+
+Frontend -> backend -> data base
+Front end logs in /var/log/nginx
+Backend logs in /var/log/messages
+
+Creating files with old date 2024 08 01
+$touch -d 20240801 file1.log
+
+Find command:
+To file the .log files which are olderthan 14 days
+$find . -name “*.log” -mtime +14
+
+Condition to check directory exists or not
+If [ -d directory_name ]
+Condition to check file exists or not
+If [ -f file_name ]
+Condition to check if a variable is empty
+If [ -z $Var”]
+then
+   # $var is empty
+Fi
+Zip command:
+$zip <zip file name> <file names to zip>
+Eg: $zip suresh.zip file1.txt file2.txt
+$ find . -name “*.log” -mtime +14 | zip suresh.zip -@ 
+-@ indicates all files found.
+
+If zip command not found, then install zip with below command
+$dnf install zip -y
+
+While loop:
+TO read the output or reading files we usually use while loop.
+While (condition)
+Do
+
+Done
+
+Crontab:
+We can schedule the scripts periodically.
+* * * * *
+M H day Month week
+Runs every 2 minutes:
+*/2 * * * * sh suresh.sh
+TO check cron is running or not check
+/var/log/cron file
+
+File system alerts:
+$ df -hT  -> filesystem usage in human readable format
+Type of file system xfs is important.
+$ df -hT | grep xfs    -> to get xfs file systems
