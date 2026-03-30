@@ -695,3 +695,85 @@ File system alerts:
 $ df -hT  -> filesystem usage in human readable format
 Type of file system xfs is important.
 $ df -hT | grep xfs    -> to get xfs file systems
+
+
+
+
+
+
+
+
+Numeric comparisons
+
+Operator	Meaning
+
+-eq	equal
+
+-ne	not equal
+
+-gt	greater than
+
+-lt	less than
+
+-ge	greater or equal
+
+-le	less or equal
+
+
+String comparisons
+
+=	equal
+
+==  equal
+
+!=	not equal
+
+-z	string is empty
+
+-n	string is not empty
+
+
+```
+if [ "$a" == "$b" ]
+then
+  echo "Strings are equal"
+fi
+
+
+if [[ "$a" == "$b" ]]
+then
+  echo "Equal"
+fi
+```
+
+File Conditions
+
+-f	file exists
+
+-d	directory exists
+
+-r	readable
+
+-w	writable
+
+-x	executable
+
+
+Logical Operators
+
+&& → AND
+
+|| → OR
+
+!   NOT (negation)     [ ! $a -eq 5 ]
+
+Using Logical Operators Inside [[ ]] (Recommended in Bash)
+
+
+```
+if [ -f file.txt ] && [ -r file.txt ]
+then
+  echo "File exists and is readable"
+fi
+```
+
